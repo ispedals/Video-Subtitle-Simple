@@ -3,7 +3,7 @@
 use v5.10;
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests => 18;
 
 use Video::Subtitle::Time;
 
@@ -19,6 +19,8 @@ is( $time->minute,         0, 'from_string with noninteger seconds parses minute
 is( $time->integer_second, 3, 'integer_seconds works' );
 is( $time->millisecond, 3500, 'millisecond works' );
 
+
+
 is( $time->as_string, '00:00:03.500', 'as_string() works' );
 is( $time->as_subrip_string(),
     '00:00:03,500', 'as_subrip_string() works' );
@@ -27,9 +29,14 @@ $time = Video::Subtitle::Time->from_string('01:16:03.578');
 cmp_ok( $time->second, '==', 3.578,
     'from_string() with leading 0 parsed second correctly' );
 is( $time->millisecond, 3578, 'millisecond works with from_string() with leading 0' );
+is( $time->hour,           1, 'from_string with nonzero hour parses correctly' );
+is( $time->minute,         16, 'from_string with nonzero minute parses correctly' );
 
-$time = Video::Subtitle::Time->from_string('00:00:03,50');
+$time = Video::Subtitle::Time->from_string('01:16:03,50');
 cmp_ok( $time->second, '==', 3.5, 'from_string() with comma works' );
+is( $time->millisecond, 3500, 'millisecond works with from_string() with comma' );
+is( $time->hour,           1, 'from_string with comma parses hour correctly' );
+is( $time->minute,         16, 'from_string with comma parses minute correctly' );
 
 $time = Video::Subtitle::Time->from_string('00:10:59,978');
 cmp_ok( $time->second, '==', 59.978,

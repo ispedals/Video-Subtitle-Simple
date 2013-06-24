@@ -3,9 +3,9 @@ package Video::Subtitle::Time;
 
 =head1 SYNOPSIS
 
-    use Subtitles::Time;
+    use Video::Subtitle::Time;
 
-    my $time = Subtitles::Time->from_string('0:00:03.50');
+    my $time = Video::Subtitle::Time->from_string('0:00:03.50');
     print "Hour   : " . $time->hour   . "\n"; #0
     print "Minute : " . $time->minute . "\n"; #0
     print "Second : " . $time->second . "\n"; #3.5
@@ -28,7 +28,7 @@ differences that result from handling noninteger seconds.
 * Accessor methods C<integer_second> and C<millisecond> have been added to easily manipulate
 the second component of the time
 
-A method C<as_subrip_string> has also been added for convenience.
+Methods C<as_subrip_string> and C<from_seconds> have also been added for convenience.
 
 =head1 METHODS
 
@@ -65,6 +65,11 @@ or an "hh:mm:ss.sss" type ISO 8601 time string
 
  Returns a new B<Time::Tiny> object, or throws an exception on error.
 
+=head2 from_seconds
+
+The C<from_seconds> method creates a new B<Time::Tiny> object from the time in seconds.
+
+ Returns a new B<Time::Tiny> object, or throws an exception on error.
 
 =head2 as_string
 
@@ -101,18 +106,48 @@ sub millisecond {
 }
 
 sub from_string {
-    my $string = $_[1];
+	my $string = $_[1];
     unless ( defined $string and ! ref $string ) {
         Carp::croak("Did not provide a string to from_string");
     }
-    unless ( $string =~ /^(\d|\d\d):(\d\d):(\d\d|(?:\d\d[.,]\d{1,3}))$/ ) {
+    unless ( $string =~ /^(\d{1,2}):(\d\d):(\d\d|(?:\d\d[.,]\d{1,3}))$/ ) {
         Carp::croak("Invalid time format (does not match ISO 8601 hh:mm:ss.sss)");
     }
-    my $secs = ($3 =~ s/,/./r);
+	my ($h, $m, $s) = ($1, $2, $3);
+	$s =~ s/,/./;
     return $_[0]->new(
-        hour   => $1 + 0,
-        minute => $2 + 0,
-        second => $secs + 0,
+        hour   => $h + 0,
+        minute => $m + 0,
+        second => $s + 0,
+    );
+}
+
+sub from_seconds {
+    my ( $self, $seconds ) = @_;
+    my $SECONDS_IN_HOUR        = 3600;
+    my $SECONDS_IN_MINUTE      = 60;
+    my $MILLISECONDS_IN_SECOND = 1000;
+    use Math::BigFloat;    #need the precision
+
+    $seconds = Math::BigFloat->new($seconds);
+
+    my $hours = int( $seconds / $SECONDS_IN_HOUR );
+    $seconds -= $hours * $SECONDS_IN_HOUR;
+    my $minutes = int( $seconds / $SECONDS_IN_MINUTE );
+    $seconds -= $minutes * $SECONDS_IN_MINUTE;
+
+    $seconds->precision(-3);
+
+    #convert back to normal numbers by turning them into scalar values
+	no bignum;
+    $hours           = $hours->bstr;
+    $minutes         = $minutes->bstr;
+    $seconds         = $seconds->bstr;
+
+	return $self->new(
+        hour   => $hours + 0,
+        minute => $minutes + 0,
+        second => $seconds + 0,
     );
 }
 
