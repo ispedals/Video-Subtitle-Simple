@@ -196,8 +196,6 @@ m/(?<sequence>\d*)(?:\s*)?\n(?<start>(?<shour>\d|\d\d):(?<sminute>\d\d):(?<sseco
     {
 		push @subtitles, Video::Subtitle::OO::SRT::Subtitle->new(%+);
     }
-	use Data::Dumper;
-	say Dumper \@subtitles;
     return $self->new( subtitles => \@subtitles );
 }
 
