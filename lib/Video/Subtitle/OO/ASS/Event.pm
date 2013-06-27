@@ -1,6 +1,6 @@
 package Video::Subtitle::OO::ASS::Event;
-
-# ABSTRACT: Moose-based representation of an ASS event
+# ABSTRACT: Representation of an ASS event
+# VERSION
 use v5.12;
 use strict;
 use warnings;

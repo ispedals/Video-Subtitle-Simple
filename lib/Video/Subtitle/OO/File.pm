@@ -1,6 +1,6 @@
 package Video::Subtitle::OO::File;
-
 # ABSTRACT: Role for a subtitle file
+# VERSION
 use v5.10;
 use strict;
 use warnings;

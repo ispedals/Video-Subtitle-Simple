@@ -1,6 +1,6 @@
 package Video::Subtitle::OO::ASS::File;
-
 # ABSTRACT: Video::Subtitle::OO::File based implementation of an ASS subtitle file
+# VERSION
 use v5.12;
 
 use Moo;

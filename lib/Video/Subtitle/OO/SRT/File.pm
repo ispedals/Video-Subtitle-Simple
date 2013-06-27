@@ -1,6 +1,6 @@
 package Video::Subtitle::OO::SRT::File;
-
 # ABSTRACT: Representation of a Subrip file that implements Video::Subtitle::OO::File
+# VERSION
 use v5.12;
 use strict;
 use warnings;

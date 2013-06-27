@@ -1,6 +1,6 @@
 package Video::Subtitle::OO::Subtitle;
-
 # ABSTRACT: Role representing a subtitle line
+# VERSION
 use v5.10;
 use strict;
 use warnings;

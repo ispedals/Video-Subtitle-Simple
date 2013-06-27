@@ -1,6 +1,6 @@
 package Video::Subtitle::OO::ASS::Style;
-
 # ABSTRACT: Representation of an ASS style
+# VERSION
 use v5.12;
 use strict;
 use warnings;
