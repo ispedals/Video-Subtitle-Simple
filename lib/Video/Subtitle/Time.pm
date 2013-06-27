@@ -53,23 +53,23 @@ converted to milliseconds as an integer from 0-59999.
 
 =head2 from_string
 
-The C<from_string> method creates a new B<Time::Tiny> object from a string.
+The C<from_string> method creates a new B<Video::Subtitle::Time> object from a string.
 
 The string is expected to be an "hh:mm:ss" type ISO 8601 time string
 
-  my $almost_midnight = Time::Tiny->from_string( '23:59:59' );
+  my $almost_midnight = Video::Subtitle::Time->from_string( '23:59:59' );
 
 or an "hh:mm:ss.sss" type ISO 8601 time string
 
-  my $almost_midnight = Time::Tiny->from_string( '23:59:59.999' );
+  my $almost_midnight = Video::Subtitle::Time->from_string( '23:59:59.999' );
 
- Returns a new B<Time::Tiny> object, or throws an exception on error.
+ Returns a new B<Video::Subtitle::Time> object, or throws an exception on error.
 
 =head2 from_seconds
 
-The C<from_seconds> method creates a new B<Time::Tiny> object from the time in seconds.
+The C<from_seconds> method creates a new B<Video::Subtitle::Time> object from the time in seconds.
 
- Returns a new B<Time::Tiny> object, or throws an exception on error.
+ Returns a new B<Video::Subtitle::Time> object, or throws an exception on error.
 
 =head2 as_string
 
@@ -84,7 +84,7 @@ Returns a string.
 The C<as_subrip_string> method is the same as <as_string> except the seconds.milliseconds
 separator is a comma.
 
-  my $almost_midnight = Time::Tiny->from_string( '23:59:59.999' );
+  my $almost_midnight = Video::Subtitle::Time->from_string( '23:59:59.999' );
   print $almost_midnight->as_subrip_string; # 23:59:59,999
 
 Returns a string.
