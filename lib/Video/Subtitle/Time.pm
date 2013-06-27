@@ -89,6 +89,12 @@ separator is a comma.
 
 Returns a string.
 
+=head2 as_seconds
+
+The C<as_seconds> method converts the time object to the duration in seconds.
+
+Returns a float.
+
 =head1 SEE ALSO
 
 L<DateTime>, L<DateTime::Tiny>, L<Time::Tiny>
@@ -163,6 +169,12 @@ sub as_subrip_string {
     my $str = $_[0]->as_string;
     $str =~ s/[.]/,/;
     return $str;
+}
+
+sub as_seconds {
+	return ($_[0]->hour * 60 * 60) +
+	($_[0]->minute * 60) +
+	$_[0]->second;
 }
 
 sub DateTime {
