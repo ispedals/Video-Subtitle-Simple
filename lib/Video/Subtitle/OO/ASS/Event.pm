@@ -17,7 +17,9 @@ use Moo;
 =head1 DESCRIPTION
 
 B<Video::Subtitle::OO::ASS::Event> represents an ASS event using L<Video::Subtitle::OO::Subtitle>. It can only handle Comment and Dialouge events. It also does not support any
-block leveling styling nor does it allow for programtic interaction with style overrides. 
+block leveling styling nor does it allow for programtic interaction with style overrides.
+
+There is an alias L<Video::Subtitle::OO::ASS::Subtitle>.
 =cut
 
 =attr Layer
