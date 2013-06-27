@@ -1,5 +1,7 @@
+## no critic
 # PODNAME: subs_to_json
 # ABSTRACT:  Converts subtitle files to JSON
+# VERSION
 use v5.12;
 use strict;
 use warnings;

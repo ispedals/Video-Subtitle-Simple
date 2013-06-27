@@ -1,5 +1,7 @@
+## no critic
 # PODNAME: subs_cleaner
 # ABSTRACT: Removes dirty characters from subtitle lines
+# VERSION
 use v5.12;
 use utf8;
 use strict;

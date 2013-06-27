@@ -1,12 +1,12 @@
+## no critic
 # PODNAME: subs_merger
 # ABSTRACT:  Merges subtitle lines together
+# VERSION
 use v5.12;
 use strict;
 use warnings;
 use Encode 'decode_utf8';
 use utf8::all;
-
-# VERSION
 
 use Video::Subtitle::OO::ASS::File;
 use Video::Subtitle::OO::ASS::Subtitle;

@@ -1,5 +1,7 @@
+## no critic
 # PODNAME: subs_converter
 # ABSTRACT:  Interconverts between Subrip and ASS subtitle format
+# VERSION
 use v5.12;
 use warnings;
 use utf8::all;
