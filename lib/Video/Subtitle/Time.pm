@@ -1,5 +1,7 @@
 package Video::Subtitle::Time;
+use parent 'Time::Tiny';
 # ABSTRACT: A Time object that supports noninteger seconds
+# VERSION
 
 =head1 SYNOPSIS
 
@@ -12,12 +14,12 @@ package Video::Subtitle::Time;
 
 =head1 DESCRIPTION
 
-b<Subtitles::Time> is a time object that has the same interface as L<Time::Tiny>,
+B<Video::Subtitle::Time> is a time object that has the same interface as L<Time::Tiny>,
 except that it supports noninteger seconds instead of forcing the use integer seconds.
 
 =head2 Differences from Time::Tiny
 
-B<Subtitles::Time> provides all of the same methods as L<Time::Tiny>, but there are some
+B<Video::Subtitle::Time> provides all of the same methods as L<Time::Tiny>, but there are some
 differences that result from handling noninteger seconds.
 
 =for :list
@@ -100,8 +102,6 @@ Returns a float.
 L<DateTime>, L<DateTime::Tiny>, L<Time::Tiny>
 
 =cut
-
-use parent 'Time::Tiny';
 
 sub integer_second {
     int($_[0]->{second}) || 0;
