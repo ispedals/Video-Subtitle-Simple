@@ -6,8 +6,8 @@ use warnings;
 
 use Test::More tests => 1;
 
-use Video::Subtitle::OO::ASS::File;
-use Video::Subtitle::OO::SRT::File;
+use Video::Subtitle::Simple::ASS::File;
+use Video::Subtitle::Simple::SRT::File;
 
 my $out = <<'END';
 [Script Info]
@@ -53,8 +53,8 @@ my $srt = <<'END';
 END
 
 is(
-    Video::Subtitle::OO::SRT::File->create_from_subtitle(
-        Video::Subtitle::OO::ASS::File->create_from_string($out)
+    Video::Subtitle::Simple::SRT::File->create_from_subtitle(
+        Video::Subtitle::Simple::ASS::File->create_from_string($out)
       )->to_string,
     $srt,
     'Unicode string worked'

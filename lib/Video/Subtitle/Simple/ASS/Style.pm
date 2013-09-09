@@ -1,4 +1,5 @@
-package Video::Subtitle::OO::ASS::Style;
+package Video::Subtitle::Simple::ASS::Style;
+
 # ABSTRACT: Representation of an ASS style
 # VERSION
 use v5.12;
@@ -9,9 +10,9 @@ use Moo;
 
 =head1 SYNOPSIS
 
-    use Video::Subtitle::OO::ASS::Style;
+    use Video::Subtitle::Simple::ASS::Style;
     
-    my $style=Video::Subtitle::OO::ASS::Style->new(Name => 'def');
+    my $style=Video::Subtitle::Simple::ASS::Style->new(Name => 'def');
     $style->Fontname('Helvatica');
     my $ASS_file_object;
     $ASS_file_object->add_style($style);
@@ -93,7 +94,8 @@ Defaults to false (0)
 Defaults to false (0)
 =cut
 
-has [ 'Bold', 'Italic', 'Underline', 'StrikeOut' ] => ( default => 0, is => 'rw' );
+has [ 'Bold', 'Italic', 'Underline', 'StrikeOut' ] =>
+  ( default => 0, is => 'rw' );
 
 =attr ScaleX
 
@@ -164,7 +166,7 @@ Defaults to 0
 Defaults to 0
 =cut
 
-has [ 'MarginL', 'MarginR', 'MarginV' ] => ( default => 0 , is => 'rw');
+has [ 'MarginL', 'MarginR', 'MarginV' ] => ( default => 0, is => 'rw' );
 
 =attr Encoding
 
@@ -235,6 +237,5 @@ sub is_equal {
     my ( $self, $other_block ) = @_;
     return $self->to_string eq $other_block->to_string;
 }
-
 
 1;

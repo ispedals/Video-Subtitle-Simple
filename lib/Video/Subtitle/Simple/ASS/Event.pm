@@ -1,4 +1,5 @@
-package Video::Subtitle::OO::ASS::Event;
+package Video::Subtitle::Simple::ASS::Event;
+
 # ABSTRACT: Representation of an ASS event
 # VERSION
 use v5.12;
@@ -8,18 +9,18 @@ use warnings;
 use Moo;
 
 =head1 SYNOPSIS
-   
-    use Video::Subtitle::OO::ASS::Event;
-    my $event=Video::Subtitle::OO::ASS::Event->new(Format => 'Dialogue', start => 2, end => 3);
-    print $event->to_string; 
+
+    use Video::Subtitle::Simple::ASS::Event;
+    my $event=Video::Subtitle::Simple::ASS::Event->new(Format => 'Dialogue', start => 2, end => 3);
+    print $event->to_string;
     #Dialogue: 0,0:00:02.000,0:00:03.000,Default,,0000,0000,0000,,
 
 =head1 DESCRIPTION
 
-B<Video::Subtitle::OO::ASS::Event> represents an ASS event using L<Video::Subtitle::OO::Subtitle>. It can only handle Comment and Dialouge events. It also does not support any
+B<Video::Subtitle::Simple::ASS::Event> represents an ASS event using L<Video::Subtitle::Simple::Subtitle>. It can only handle Comment and Dialouge events. It also does not support any
 block leveling styling nor does it allow for programtic interaction with style overrides.
 
-There is an alias L<Video::Subtitle::OO::ASS::Subtitle>.
+There is an alias L<Video::Subtitle::Simple::ASS::Subtitle>.
 =cut
 
 =attr Layer
@@ -60,7 +61,7 @@ The string name of the event. It defaults to ''.
 
 has 'Name' => (
     is      => 'rw',
-    default => sub{return ''},
+    default => sub { return '' },
 );
 
 =attr MarginL
@@ -90,7 +91,7 @@ The effect applied to the event. It defaults to nothing.
 
 has 'Effect' => (
     is      => 'rw',
-    default => sub{ return '' },
+    default => sub { return '' },
 );
 
 =attr Text
@@ -129,7 +130,7 @@ Returns the text of the event as is.
 Sets the text of the event
 =cut
 
-with 'Video::Subtitle::OO::Subtitle';
+with 'Video::Subtitle::Simple::Subtitle';
 
 =method get_format
 

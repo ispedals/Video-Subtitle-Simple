@@ -3,12 +3,12 @@
 use v5.10;
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests => 12;
 
-use Video::Subtitle::OO::SRT::File;
+use Video::Subtitle::Simple::SRT::File;
 
-my $file = Video::Subtitle::OO::SRT::File->new;
-isa_ok( $file, 'Video::Subtitle::OO::SRT::File' );
+my $file = Video::Subtitle::Simple::SRT::File->new;
+isa_ok( $file, 'Video::Subtitle::Simple::SRT::File' );
 
 my @subtitles = @{ $file->subtitles };
 is( scalar @subtitles, 0, 'Empty constructor defaulted to no subtitles' );
@@ -39,8 +39,8 @@ is( scalar $file->get_subtitles_by_attribute( sub { $_->get_text =~ /^</; } ),
     2, 'get_subtitles_by_attribute() works' );
 
 $file->remove_subtitle($_)
-  foreach $file->get_subtitles_by_attribute( sub { $_->start->second == 30; }
-  );
+  foreach $file->get_subtitles_by_attribute(
+    sub { $_->start->as_seconds == 30; } );
 my @s = $file->get_subtitles();
 is( scalar @s, 3, 'remove_subtitle() works' );
 
@@ -58,22 +58,41 @@ B
 C
 END
 
-$file = Video::Subtitle::OO::SRT::File->create_from_string($out);
+$file = Video::Subtitle::Simple::SRT::File->create_from_string($out);
 is( $file->to_string, $out, 'create_from_string() worked' );
 
 my $newout = "\t  \n$out";
 
-$file = Video::Subtitle::OO::SRT::File->create_from_string($newout);
+$file = Video::Subtitle::Simple::SRT::File->create_from_string($newout);
 is( $file->to_string, $out,
     'create_from_string() with leading whitespace worked' );
 @subs = $file->get_subtitles;
-is( $subs[2]->get_text, 'C', 'get_subtitles() sorted numerically' );my $file2 = Video::Subtitle::OO::SRT::File->new();
-$file2->add_subtitle( { start => "00:01:34,117",  end => "00:01:36,953",  text => 'A' } );
-$file2->add_subtitle( { start => "00:01:36,953",  end => "00:01:39,053",  text => 'B' } );
-$file2->add_subtitle( { start => "00:01:40,106", end => "00:01:42,106", text => 'C' } );
-#TODO add test that fails when sorted stringly and when start and end take seconds only values
-#$file2->add_subtitle( { start => 94.117,  end => 96.953,  text => 'A' } );
-#$file2->add_subtitle( { start => 96.953,  end => 99.053,  text => 'B' } );
-#$file2->add_subtitle( { start => 100.106, end => 102.106, text => 'C' } );
-
+is( $subs[2]->get_text, 'C', 'get_subtitles() sorted numerically' );
+my $file2 = Video::Subtitle::Simple::SRT::File->new();
+$file2->add_subtitle(
+    { start => "00:01:34,117", end => "00:01:36,953", text => 'A' } );
+$file2->add_subtitle(
+    { start => "00:01:36,953", end => "00:01:39,053", text => 'B' } );
+$file2->add_subtitle(
+    { start => "00:01:40,106", end => "00:01:42,106", text => 'C' } );
 ok( $file->is_equal($file2), 'is_equal() works' );
+
+$out = <<END;
+1
+00:00:34,117 --> 00:00:36,953
+A
+
+2
+00:00:36,953 --> 00:00:39,053
+B
+
+3
+00:01:04,106 --> 00:01:04,106
+C
+END
+
+$file = Video::Subtitle::Simple::SRT::File->create_from_string($out);
+@subs = $file->get_subtitles;
+is( $subs[0]->get_text, 'A',
+'get_subtitles() sorted by considering the entire timestamp, not just the "second" component'
+);

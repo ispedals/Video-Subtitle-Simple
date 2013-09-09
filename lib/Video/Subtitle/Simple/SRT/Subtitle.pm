@@ -1,5 +1,6 @@
-package Video::Subtitle::OO::SRT::Subtitle;
-# ABSTRACT: Representation of a Subrip subtitle that implements Video::Subtitle::OO::Subtitle
+package Video::Subtitle::Simple::SRT::Subtitle;
+
+# ABSTRACT: Representation of a Subrip subtitle that implements Video::Subtitle::Simple::Subtitle
 # VERSION
 use v5.12;
 use strict;
@@ -9,9 +10,9 @@ use Moo;
 
 =head1 SYNOPSIS
 
-    use Video::Subtitle::OO::SRT::Subtitle;
+    use Video::Subtitle::Simple::SRT::Subtitle;
 
-    my $line = Video::Subtitle::OO::SRT::Subtitle->new(start => 2, end => 3, text => 'Test');
+    my $line = Video::Subtitle::Simple::SRT::Subtitle->new(start => 2, end => 3, text => 'Test');
     print $line->to_string;
 
     #0:00:02,000 --> 0:00:03,000
@@ -19,21 +20,21 @@ use Moo;
 
 =head1 DESCRIPTION
 
-B<Video::Subtitle::OO::SRT::Subtitle> represent a Subrip subtitle line that consumes the L<Video::Subtitle::OO::Subtitle> role.
+B<Video::Subtitle::Simple::SRT::Subtitle> represent a Subrip subtitle line that consumes the L<Video::Subtitle::Simple::Subtitle> role.
 It does not understand any markup, and therefore it will not be stripped by get_text. This module follows the multi-line Subrip format.
 The constructor expects a hash with the fields: C<start>, C<end>, and C<text>. If C<text> is not supplied, a blank string will be assumed.
 =cut
 
 has 'text' => (
     is      => 'rw',
-    default => sub{ return '' },
+    default => sub { return '' },
     reader  => 'get_text',
     writer  => 'set_text',
 );
 
 =method get_text
 
-Returns the text of the line. Note that L<Video::Subtitle::OO::Subtitle> requires that all formatting be removed, but because this module does not
+Returns the text of the line. Note that L<Video::Subtitle::Simple::Subtitle> requires that all formatting be removed, but because this module does not
 understand formatting, if any formatting is present, it will be treated as plain text and returned as is
 =cut
 
@@ -58,13 +59,13 @@ around 'set_text' => sub {
 
 =attr start
 
-A L<Video::Subtitle::Time> object representing the start time of the line. This attribute must be specified during construction.
+A L<Video::Subtitle::Simple::Time> object representing the start time of the line. This attribute must be specified during construction.
 Both a Subrip timestamp or a number representing the time in seconds may be used to set the value.
 =cut
 
 =attr end
 
-A L<Video::Subtitle::Time> object representing the end time of the line. This attribute must be specified during construction.
+A L<Video::Subtitle::Simple::Time> object representing the end time of the line. This attribute must be specified during construction.
 Both a Subrip timestamp or a number representing the time in seconds may be used to set the value.
 =cut
 
@@ -86,11 +87,11 @@ sub to_string {
     return $ret;
 }
 
-with 'Video::Subtitle::OO::Subtitle';
+with 'Video::Subtitle::Simple::Subtitle';
 
 =method duration
 
-Returns a L<Video::Subtitle::Time> object representing the duration of the subtitle line
+Returns a L<Video::Subtitle::Simple::Time> object representing the duration of the subtitle line
 =cut
 
 =method hash_code

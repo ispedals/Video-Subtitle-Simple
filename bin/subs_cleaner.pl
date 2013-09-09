@@ -6,28 +6,32 @@ use v5.12;
 use utf8;
 use strict;
 use warnings;
-use Encode 'decode_utf8';
-use utf8::all;
 
-use Video::Subtitle::OO::ASS::File;
-use Video::Subtitle::OO::SRT::File;
+binmode( STDOUT, ":encoding(utf8)" );
 
-use File::Slurp;
+use Video::Subtitle::Simple::ASS::File;
+use Video::Subtitle::Simple::SRT::File;
 
 use Getopt::Long;
 use Pod::Usage;
 
+use File::Slurp;
+
 my $man  = 0;
 my $help = 0;
 my $input_format;
+my $encoding;
 GetOptions(
     'help|?'         => \$help,
     man              => \$man,
-    'input_format=s' => \$input_format,
+    'input-format=s' => \$input_format,
+    'encodings=s'    => \$encoding,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
 pod2usage( -verbose => 2 ) if $man;
+
+$encoding //= 'utf8';
 
 my $input_file;
 if ( @ARGV == 0 && !-t STDIN ) {
@@ -38,17 +42,23 @@ elsif ( @ARGV == 0 ) {
 }
 else {
     die "Invalid filename $ARGV[0]" unless -e $ARGV[0];
-    $input_file = read_file( $ARGV[0] );
+    $input_file = do {
+        local $/;
+        open( my $fh, "<:encoding($encoding)", $ARGV[0] )
+          or die "could not open $ARGV[0]: $!\n";
+        <$fh>;
+    };
 }
 
 my %formats = ( ASS => 'SRT', SRT => 'ASS' );
 $input_format = uc $input_format;
-my $file = ( 'Video::Subtitle::OO::' . $formats{$input_format} . '::File' )->create_from_string($input_file);
-my $newfile = ( 'Video::Subtitle::OO::' . $formats{$input_format} . '::File' )->new;
+my $file = ( 'Video::Subtitle::Simple::' . $formats{$input_format} . '::File' )
+  ->create_from_string($input_file);
+my $newfile =
+  ( 'Video::Subtitle::Simple::' . $formats{$input_format} . '::File' )->new;
 
 for ( $file->get_subtitles ) {
     my $t = $_->get_text;
-    $t = decode_utf8($t);
 
     next if $t !~ /\p{InJapanese}/;
 
@@ -91,7 +101,8 @@ subs_converter.pl [options] [file]
 Options:
     -help brief help message
     -man full documentation
-    -input_format format of the original subtitle; either 'ass' or 'srt'
+    -input-format format of the original subtitle; either 'ass' or 'srt'
+    -encoding the format the subtite is encoded in; default is utf8
 
 =head1 OPTIONS
 
@@ -105,9 +116,13 @@ Print a brief help message and exits.
 
 Prints the manual page and exits.
 
-=item B<-input_format>
+=item B<-input-format>
 
 the format of the original subtitle; either 'ass' or 'srt'
+
+=item B<-encoding>
+
+the format the subtite is encoded in. See L<Encode::Supported> for valid values. Default is utf8
 
 =back
 

@@ -1,5 +1,6 @@
-package Video::Subtitle::OO::ASS::File;
-# ABSTRACT: Video::Subtitle::OO::File based implementation of an ASS subtitle file
+package Video::Subtitle::Simple::ASS::File;
+
+# ABSTRACT: Video::Subtitle::Simple::File based implementation of an ASS subtitle file
 # VERSION
 use v5.12;
 
@@ -9,53 +10,53 @@ use Carp;
 use File::Slurp;
 use Text::Trim;
 
-use Video::Subtitle::OO::ASS::Style;
-use Video::Subtitle::OO::ASS::Event;
+use Video::Subtitle::Simple::ASS::Style;
+use Video::Subtitle::Simple::ASS::Event;
 
 =head1 SYNOPSIS
 
-    
-    #create Video::Subtitle::OO::ASS::File object from a filehandle
-    use Video::Subtitle::OO::ASS::File;
+
+    #create Video::Subtitle::Simple::ASS::File object from a filehandle
+    use Video::Subtitle::Simple::ASS::File;
     my $file_handle;
-    my $file=Video::Subtitle::OO::ASS::File->create_from_file($file_handle);
-    
+    my $file=Video::Subtitle::Simple::ASS::File->create_from_file($file_handle);
+
     #add events file
     $file->add_event(Format => 'Dialogue', start => 2, end => 3, Text => 'C,A');
     $file->add_dialogue(start => 30, end => 60, Text => '<Hola>', Name => 'Bill');
     $file->add_dialogue(start => "0:01:15", end => "0:01:20", Text => '<Como estas>', Name => 'Jill');
     $file->add_comment(start => 0, end => 1, Text => 'A');
     my @subs=$file->get_subtitles;
-    
+
     #remove events
     $file->remove_event($_) foreach $file->get_events_by_attribute(sub{$_->Name eq 'Bill'});
     @subs=$file->get_subtitles; #file no longer contains line with name 'Bill'
-    
-        
+
+
     #add styles
     $file->add_style(Name => 'Note');
-    
-    
+
+
     #remove styles
     $file->remove_style($_) foreach $file->get_style_by_attribute(sub{$_->Name eq 'Boom'});
 
     #output file
     print $file->to_string;
-    
-    
+
+
     #convert ASS subtitle to SRT format
-    use Video::Subtitle::OO::SRT::File;
-    print Video::Subtitle::OO::SRT::File->create_from_subtitle($file)->to_string;
+    use Video::Subtitle::Simple::SRT::File;
+    print Video::Subtitle::Simple::SRT::File->create_from_subtitle($file)->to_string;
 
 =head1 DESCRIPTION
 
-B<Video::Subtitle::OO::ASS::File> only parses three blocks, Info, Styles, and Events. The Info block is represented as a hashref, and the Style and Event
+B<Video::Subtitle::Simple::ASS::File> only parses three blocks, Info, Styles, and Events. The Info block is represented as a hashref, and the Style and Event
 blocks are represented as an array of the corresponding object. The events do not understand any style overrides.
 =cut
 
 =attr Info
 
-HashRef representing the info block of an ASS file. It defaults to: 
+HashRef representing the info block of an ASS file. It defaults to:
     Title:untitled
     Original Script:unknown
     Collisions:Normal
@@ -82,7 +83,7 @@ has 'Info' => (
 #subtype 'CollectionofStyles' => as 'ArrayRef[Subtitles::ASS::Style]';
 
 #coerce 'CollectionofStyles' => from 'HashRef' =>
-  #via { [ Subtitles::ASS::Style->new( %{$_} ) ] };
+#via { [ Subtitles::ASS::Style->new( %{$_} ) ] };
 
 #coerce 'CollectionofStyles' => from 'Subtitles::ASS::Style' => via { [$_] };
 
@@ -92,43 +93,46 @@ has 'Info' => (
 
 =attr Styles
 
-An array containing L<Video::Subtitle::OO::ASS::Style> objects representing the styles of the file.
+An array containing L<Video::Subtitle::Simple::ASS::Style> objects representing the styles of the file.
 =cut
 
 has 'Styles' => (
-    is      => 'rw',
-    handles_via  => 'Array',
-    default => sub { [ Video::Subtitle::OO::ASS::Style->new( 'Name' => 'Default' ) ] },
+    is          => 'rw',
+    handles_via => 'Array',
+    default     => sub {
+        [ Video::Subtitle::Simple::ASS::Style->new( 'Name' => 'Default' ) ];
+    },
     handles => {
         get_style_by_attribute => 'grep',
-#        add_style              => 'push',
+
+        #        add_style              => 'push',
     },
 );
 
 =method add_style
 
-Adds the given L<Video::Subtitle::OO::ASS::Style> object or hash of a style to the file.
+Adds the given L<Video::Subtitle::Simple::ASS::Style> object or hash of a style to the file.
 =cut
 
 sub add_style {
-	my $self = shift;
-	if(ref($_[0])) {
-		push @{$self->Styles}, $_[0];
-	}
-	else {
-		push @{$self->Styles}, Video::Subtitle::OO::ASS::Style->new(@_);
-	}
-	return $self;
+    my $self = shift;
+    if ( ref( $_[0] ) ) {
+        push @{ $self->Styles }, $_[0];
+    }
+    else {
+        push @{ $self->Styles }, Video::Subtitle::Simple::ASS::Style->new(@_);
+    }
+    return $self;
 }
 
 =method remove_style
 
-Removes the given L<Video::Subtitle::OO::ASS::Style> from the file
+Removes the given L<Video::Subtitle::Simple::ASS::Style> from the file
 =cut
 
 sub remove_style {
     my ( $self, $style ) = @_;
-    $self->Styles( [grep { !$_->is_equal($style) } @{ $self->Styles }] );
+    $self->Styles( [ grep { !$_->is_equal($style) } @{ $self->Styles } ] );
     return $self;
 }
 
@@ -158,89 +162,94 @@ sub remove_style {
 
 =attr Events
 
-Array containing all the events of the file as L<Video::Subtitle::OO::ASS::Event> objects
+Array containing all the events of the file as L<Video::Subtitle::Simple::ASS::Event> objects
 =cut
 
 has 'Events' => (
-    is      => 'rw',
-    handles_via  => 'Array',
-    default => sub { [] },
-    handles => {
+    is          => 'rw',
+    handles_via => 'Array',
+    default     => sub { [] },
+    handles     => {
         get_events_by_attribute => 'grep',
-#        add_event               => 'push',
-#        add_subtitle            => 'push',
+
+        #        add_event               => 'push',
+        #        add_subtitle            => 'push',
     },
 );
 
 =method get_events_by_attribute
 
-Given a subroutine, it returns a list of all L<Video::Subtitle::OO::ASS::Event> that return a true value
+Given a subroutine, it returns a list of all L<Video::Subtitle::Simple::ASS::Event> that return a true value
 =cut
 
 =method add_event
 
-Adds the given L<Video::Subtitle::OO::ASS::Event> to the file
+Adds the given L<Video::Subtitle::Simple::ASS::Event> to the file
 =cut
 
 sub add_event {
-	my $self = shift;
-	if(ref($_[0])) {
-		push @{$self->Events}, $_[0];
-	}
-	else {
-		push @{$self->Events}, Video::Subtitle::OO::ASS::Event->new(@_);
-	}
-	return $self;
+    my $self = shift;
+    if ( ref( $_[0] ) ) {
+        push @{ $self->Events }, $_[0];
+    }
+    else {
+        push @{ $self->Events }, Video::Subtitle::Simple::ASS::Event->new(@_);
+    }
+    return $self;
 }
 
 =method add_subtitle
 
-Adds the given L<Video::Subtitle::OO::Subtitle> consuming object to the file 
+Adds the given L<Video::Subtitle::Simple::Subtitle> consuming object to the file
 =cut
 
 sub add_subtitle {
-	my $self = shift;
-	if(ref($_[0])) {
-		push @{$self->Events}, Video::Subtitle::OO::ASS::Event->new(
-			start => $_[0]->start,
-			end => $_[0]->end,
-			Text => $_[0]->get_text,
-			Format => 'Dialogue'
-		);
-	}
-	else {
-		push @{$self->Events}, Video::Subtitle::OO::ASS::Event->new(@_,  Format => 'Dialogue');
-	}
-	return $self;
+    my $self = shift;
+    if ( ref( $_[0] ) ) {
+        push @{ $self->Events },
+          Video::Subtitle::Simple::ASS::Event->new(
+            start  => $_[0]->start,
+            end    => $_[0]->end,
+            Text   => $_[0]->get_text,
+            Format => 'Dialogue'
+          );
+    }
+    else {
+        push @{ $self->Events },
+          Video::Subtitle::Simple::ASS::Event->new( @_, Format => 'Dialogue' );
+    }
+    return $self;
 }
 
-with 'Video::Subtitle::OO::File';
+with 'Video::Subtitle::Simple::File';
 
 =method add_dialogue
 
-Given a hash with the required fields for an L<Video::Subtitle::OO::ASS::Event> object (start, end, text), the event will be added formatted as a dialogue
+Given a hash with the required fields for an L<Video::Subtitle::Simple::ASS::Event> object (start, end, text), the event will be added formatted as a dialogue
 =cut
 
 sub add_dialogue {
     my $self = shift;
-    $self->add_event( Video::Subtitle::OO::ASS::Event->new(@_, Format => 'Dialogue') );
+    $self->add_event(
+        Video::Subtitle::Simple::ASS::Event->new( @_, Format => 'Dialogue' ) );
     return $self;
 }
 
 =method add_comment
 
-Given a hash with the required fields for an L<Video::Subtitle::OO::ASS::Event> object (start, end, Text), the event will be added formatted as a comment
+Given a hash with the required fields for an L<Video::Subtitle::Simple::ASS::Event> object (start, end, Text), the event will be added formatted as a comment
 =cut
 
 sub add_comment {
     my $self = shift;
-    $self->add_event( Video::Subtitle::OO::ASS::Event->new(@_, Format => 'Comment') );
+    $self->add_event(
+        Video::Subtitle::Simple::ASS::Event->new( @_, Format => 'Comment' ) );
     return $self;
 }
 
 =method remove_event
 
-Removes any matching L<Video::Subtitle::OO::ASS::Event> object from the file
+Removes any matching L<Video::Subtitle::Simple::ASS::Event> object from the file
 =cut
 
 sub remove_event {
@@ -252,7 +261,7 @@ sub remove_event {
 
 =method remove_subtitle
 
-Removes any matching L<Video::Subtitle::OO::Subtitle> consuming object from the file
+Removes any matching L<Video::Subtitle::Simple::Subtitle> consuming object from the file
 =cut
 
 sub remove_subtitle {
@@ -263,7 +272,7 @@ sub remove_subtitle {
         Text   => $subtitle->get_text,
         Format => 'Dialogue'
     };
-    $self->remove_event( Video::Subtitle::OO::ASS::Event->new($params) );
+    $self->remove_event( Video::Subtitle::Simple::ASS::Event->new($params) );
     return $self;
 }
 
@@ -276,7 +285,7 @@ events and the order of the resulting list is not given.
 sub get_subtitles {
     my $self = shift;
     my @ret =
-      sort { $a->start->second <=> $b->start->second }
+      sort { $a->start->as_seconds <=> $b->start->as_seconds }
       grep { $_->Format eq 'Dialogue' } @{ $self->Events };
     return @ret;
 }
@@ -298,13 +307,17 @@ sub to_string {
     }
     $ret .= "\n";
     $ret .= "[V4+ Styles]\n";
-    $ret .= 'Format: '
-      . join( ', ', @{ Video::Subtitle::OO::ASS::Style->get_format } ) . "\n";
+    $ret .=
+        'Format: '
+      . join( ', ', @{ Video::Subtitle::Simple::ASS::Style->get_format } )
+      . "\n";
     $ret .= join( "\n", map { $_->to_string } @{ $self->Styles } );
     $ret .= "\n";
     $ret .= "[Events]\n";
-    $ret .= 'Format: '
-      . join( ', ', @{ Video::Subtitle::OO::ASS::Event->get_format } ) . "\n";
+    $ret .=
+        'Format: '
+      . join( ', ', @{ Video::Subtitle::Simple::ASS::Event->get_format } )
+      . "\n";
     $ret .= join( "\n", map { $_->to_string } @{ $self->Events } );
     $ret .= "\n";
     return $ret;
@@ -312,7 +325,7 @@ sub to_string {
 
 =method create_from_string
 
-Returns a B<Video::Subtitle::OO::ASS::File> object from the given string
+Returns a B<Video::Subtitle::Simple::ASS::File> object from the given string
 =cut
 
 sub create_from_string {
@@ -323,7 +336,7 @@ sub create_from_string {
 
 =method create_from_file
 
-Returns a B<Video::Subtitle::OO::ASS::File> object from a valid filename or handle
+Returns a B<Video::Subtitle::Simple::ASS::File> object from a valid filename or handle
 =cut
 
 sub create_from_file {
@@ -406,7 +419,9 @@ sub _create_from_array {
         'V4+ Styles' => sub {
             my $hashes = [ $parse_formatted_block->( { 'Style' => 1 } ) ];
             delete $hashes->[$_]{'Format'} for ( 0 .. scalar @{$hashes} - 1 );
-            push @{$blocks{'Styles'}}, Video::Subtitle::OO::ASS::Style->new(%$_) for @$hashes;
+            push @{ $blocks{'Styles'} },
+              Video::Subtitle::Simple::ASS::Style->new(%$_)
+              for @$hashes;
         },
         'Events' => sub {
             my $hashes =
@@ -421,7 +436,9 @@ sub _create_from_array {
                 }
                 delete @{ $hashes->[$_] }{ keys %key_mappings };
             }
-            push @{$blocks{'Events'}}, Video::Subtitle::OO::ASS::Event->new(%$_) for @$hashes;
+            push @{ $blocks{'Events'} },
+              Video::Subtitle::Simple::ASS::Event->new(%$_)
+              for @$hashes;
           }
     };
 
@@ -444,7 +461,7 @@ sub _create_from_array {
 
 =method hash_code
 
-Returns a string hash code of the object. 
+Returns a string hash code of the object.
 Note that this is sensative to whitespace and formatting differences in the lines and the ordering of lines.
 This means that if a subtitle file contains lines with the same start and end times, different hash codes returned could be returned
 depending on how the lines are sorted
@@ -457,7 +474,7 @@ Returns whether the given Subtitle::File object is equal to the object. The same
 
 =method create_from_subtitle
 
-Creates a L<Video::Subtitle::OO::File> object from the given L<Video::Subtitle::OO::File> object.
+Creates a L<Video::Subtitle::Simple::File> object from the given L<Video::Subtitle::Simple::File> object.
 This is useful if one wants to convert an object into another subtitle format. However, there is no expectation that any formatting markup will
 be preserved during the conversion.
 =cut

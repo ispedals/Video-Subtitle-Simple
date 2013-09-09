@@ -5,10 +5,10 @@ use warnings;
 
 use Test::More tests => 4;
 
-use Video::Subtitle::OO::ASS::File;
+use Video::Subtitle::Simple::ASS::File;
 
-my $file = Video::Subtitle::OO::ASS::File->new;
-isa_ok( $file, 'Video::Subtitle::OO::ASS::File' );
+my $file = Video::Subtitle::Simple::ASS::File->new;
+isa_ok( $file, 'Video::Subtitle::Simple::ASS::File' );
 
 my @events = @{ $file->Events };
 is( scalar @events, 0, 'Empty constructor defaulted to no events' );
