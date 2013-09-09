@@ -45,11 +45,11 @@ use Video::Subtitle::Simple::SRT::Subtitle;
 B<Video::Subtitle::Simple::SRT::File> consumes L<Video::Subtitle::Simple::File> for the Subrip(srt) file format. It does not understand any formatting markup, which means that if any
 markup is present in a subtitle line, it will be treated as plain text. This module only understands the multi-line subrip format, which is:
 
-	index_number
-	hh:mm:ss,msmsms --> hh:mm:ss,msmsms
-	Text
-	Text
-	...
+    index_number
+    hh:mm:ss,msmsms --> hh:mm:ss,msmsms
+    Text
+    Text
+    ...
 
 The single-line format will not be parsed or outputted.
 
@@ -61,29 +61,6 @@ By being a consumer of L<Video::Subtitle::Simple::File>, this module has the fol
 * create_from_subtitle
 
 =cut
-
-# unimplement for now
-# coerce 'Subtitles::SRT::Subtitle' => from
-# 'HashRef' => via { Subtitles::SRT::Subtitle->new( %{$_} ) },
-# => from 'Subtitles::Subtitle',
-# => via {
-# $_->isa('Subtitles::SRT::Subtitle') ? $_ : Subtitles::SRT::Subtitle->new(
-# start => $_->start,
-# end   => $_->end,
-# text  => $_->get_text
-# );
-# };
-
-# subtype 'CollectionofSRT' => as 'ArrayRef[Subtitles::SRT::Subtitle]';
-
-# coerce 'CollectionofSRT' => from 'HashRef' =>
-# via { [ Subtitles::SRT::Subtitle->new( %{$_} ) ] };
-
-# coerce 'CollectionofSRT' => from 'Subtitles::SRT::Subtitle' => via { [$_] };
-
-# coerce 'CollectionofSRT' => from 'ArrayRef[HashRef]' => via {
-# [ map { Subtitles::SRT::Subtitle->new( %{$_} ) } @{$_} ];
-# };
 
 =attr subtitles
 
@@ -97,8 +74,6 @@ has 'subtitles' => (
     default     => sub { return [] },
     handles     => {
         get_subtitles_by_attribute => 'grep',
-
-        #        add_subtitle               => 'push'
     },
 );
 
@@ -135,7 +110,7 @@ Given a subroutine, an array of L<Video::Subtitle::Simple::SRT::Subtitle> will b
 
 Removes all subtitles that is equal to the given L<Video::Subtitle::Simple::Subtitle> implementing object
 
-	returns self
+    returns self
 =cut
 
 sub remove_subtitle {
@@ -167,11 +142,11 @@ sub get_subtitles {
 
 Returns a string representation of a Subrip file, defined as:
 
-	index_number
-	hh:mm:ss,msmsms --> hh:mm:ss,msmsms
-	Text
-	Text
-	...
+    index_number
+    hh:mm:ss,msmsms --> hh:mm:ss,msmsms
+    Text
+    Text
+    ...
 
 =cut
 

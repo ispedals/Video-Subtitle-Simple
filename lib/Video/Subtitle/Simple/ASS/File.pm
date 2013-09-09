@@ -77,20 +77,6 @@ has 'Info' => (
     },
 );
 
-#coerce 'Subtitles::ASS::Style' => from 'HashRef' =>
-#  via { Subtitles::ASS::Style->new( %{$_} ) };
-
-#subtype 'CollectionofStyles' => as 'ArrayRef[Subtitles::ASS::Style]';
-
-#coerce 'CollectionofStyles' => from 'HashRef' =>
-#via { [ Subtitles::ASS::Style->new( %{$_} ) ] };
-
-#coerce 'CollectionofStyles' => from 'Subtitles::ASS::Style' => via { [$_] };
-
-#coerce 'CollectionofStyles' => from 'ArrayRef[HashRef]' => via {
-#    [ map { Subtitles::ASS::Style->new( %{$_} ) } @{$_} ];
-#};
-
 =attr Styles
 
 An array containing L<Video::Subtitle::Simple::ASS::Style> objects representing the styles of the file.
@@ -104,8 +90,6 @@ has 'Styles' => (
     },
     handles => {
         get_style_by_attribute => 'grep',
-
-        #        add_style              => 'push',
     },
 );
 
@@ -136,30 +120,6 @@ sub remove_style {
     return $self;
 }
 
-#coerce
-#  'Subtitles::ASS::Event' => from 'HashRef',
-#  => via { Subtitles::ASS::Event->new( %{$_} ) },
-#  => from 'Subtitles::Subtitle',
-#  => via {
-#    $_->isa('Subtitles::ASS::Event') ? $_ : Subtitles::ASS::Event->new(
-#        start  => $_->start,
-#        end    => $_->end,
-#        Text   => $_->get_text,
-#        Format => 'Dialogue'
-#    );
-#  };
-
-#subtype 'CollectionofEvents' => as 'ArrayRef[Subtitles::ASS::Event]';
-
-#coerce 'CollectionofEvents' => from 'HashRef' =>
-#  via { [ Subtitles::ASS::Event->new( %{$_} ) ] };
-
-#coerce 'CollectionofEvents' => from 'Subtitles::ASS::Event' => via { [$_] };
-
-#coerce 'CollectionofEvents' => from 'ArrayRef[HashRef]' => via {
-#    [ map { Subtitles::ASS::Event->new( %{$_} ) } @{$_} ];
-#};
-
 =attr Events
 
 Array containing all the events of the file as L<Video::Subtitle::Simple::ASS::Event> objects
@@ -171,9 +131,6 @@ has 'Events' => (
     default     => sub { [] },
     handles     => {
         get_events_by_attribute => 'grep',
-
-        #        add_event               => 'push',
-        #        add_subtitle            => 'push',
     },
 );
 
