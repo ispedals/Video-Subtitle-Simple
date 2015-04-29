@@ -1,4 +1,5 @@
 package Video::Subtitle::Simple;
+
 # ABSTRACT: Roles for defining a subtitle format
 # VERSION
 
@@ -9,12 +10,12 @@ are intended to provide a clean interface for creating and manipulating subtitle
 
 =head2 Assumptions
 
-B<Video::Subtitle::Simple> assumes many things that are not true about many subtitle formats. Therefore, some subtitle formats
-may not be accuretly represented by the given interface, but it is hoped that the provided interface is sufficently useful
+B<Video::Subtitle::Simple> assumes things that are not true about many subtitle formats. Therefore, some subtitle formats
+may not be accurately represented by this interface definition, but it is hoped that the provided interface is sufficently useful
 at the expense of some loss of information.
 
 B<Video::Subtitle::Simple> assumes that a subtitle file can be represented as container that
-holds an array of subtitle lines. This means that any metadata contained about the file itself, such as intended aspect ratio, global styling information
+holds a list of subtitle lines. This means that any metadata contained about the file itself, such as intended aspect ratio, global styling information
 or comments, are not exposed through this interface and therefore may be not be preserved during manipulation. It is assumed that a subtitle file
 can be created from a string representation of the file and that the file itself can be serialized as a string. Modules representing subtitle files
 should consume L<Video::Subtitle::Simple::File>.
