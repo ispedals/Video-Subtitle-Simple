@@ -9,6 +9,7 @@ use warnings;
 use Moo;
 use MooX::HandlesVia;
 use File::Slurp;
+use Carp;
 use Video::Subtitle::Simple::SRT::Subtitle;
 
 =head1 SYNOPSIS
@@ -65,7 +66,7 @@ By being a consumer of L<Video::Subtitle::Simple::File>, this module has the fol
 =attr subtitles
 
 This is an array containing the L<Video::Subtitle::Simple::SRT::Subtitle> lines that make up the file. While it can be accessed directly
-there is no guarantee that the lines will be in chronological order that C<get_subtitles> makes.
+there is no guarantee that the lines will be in chronological order that C<get_subtitles> ensures.
 =cut
 
 has 'subtitles' => (
@@ -78,18 +79,28 @@ has 'subtitles' => (
 );
 
 sub add_subtitle {
-    my ( $self, $subtitle ) = @_;
-    if ( ref($subtitle) eq 'HASH' ) {
+    my $self = shift @_;
+    if ( scalar @_ > 1 ) {
         push @{ $self->subtitles },
-          Video::Subtitle::Simple::SRT::Subtitle->new(%$subtitle);
+          Video::Subtitle::Simple::SRT::Subtitle->new(@_);
+        return $self;
     }
-    else {
+
+    my $subtitle = shift @_;
+    if ( $subtitle->DOES('Video::Subtitle::Simple::Subtitle') ) {
         push @{ $self->subtitles },
           Video::Subtitle::Simple::SRT::Subtitle->new(
             start => $subtitle->start,
             end   => $subtitle->end,
             text  => $subtitle->get_text
           );
+    }
+    elsif ( ref($subtitle) eq 'HASH' ) {
+        push @{ $self->subtitles },
+          Video::Subtitle::Simple::SRT::Subtitle->new(%$subtitle);
+    }
+    else {
+        Carp::croak('invalid argument');
     }
     return $self;
 }
@@ -98,23 +109,25 @@ with 'Video::Subtitle::Simple::File';
 
 =method add_subtitle
 
-Adds a subtitle to subtitles, parameter can be either a hashref of the required fields or a L<Video::Subtitle::Simple::Subtitle> implementing object
+Adds a subtitle to subtitles, parameter can be a hashref or hash of the required fields or a L<Video::Subtitle::Simple::Subtitle> implementing object. Throws exception on error.
 =cut
 
 =method get_subtitles_by_attribute
 
-Given a subroutine, an array of L<Video::Subtitle::Simple::SRT::Subtitle> will be returned that match
+Given a subroutine, a list of L<Video::Subtitle::Simple::SRT::Subtitle> will be returned that match
 =cut
 
 =method remove_subtitle
 
-Removes all subtitles that is equal to the given L<Video::Subtitle::Simple::Subtitle> implementing object
+Removes all subtitles that is equal to the given L<Video::Subtitle::Simple::Subtitle> implementing object. Throws exception on error.
 
     returns self
 =cut
 
 sub remove_subtitle {
     my ( $self, $subtitle ) = @_;
+    Carp::croak('was not a Video::Subtitle::Simple::Subtitle object')
+      unless $subtitle->DOES('Video::Subtitle::Simple::Subtitle');
     $subtitle = Video::Subtitle::Simple::SRT::Subtitle->new(
         start => $subtitle->start,
         end   => $subtitle->end,
