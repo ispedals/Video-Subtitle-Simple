@@ -95,16 +95,23 @@ has 'Styles' => (
 
 =method add_style
 
-Adds the given L<Video::Subtitle::Simple::ASS::Style> object or hash of a style to the file.
+Adds the given L<Video::Subtitle::Simple::ASS::Style> object, hash, or hashref of a style to the file.
 =cut
 
 sub add_style {
     my $self = shift;
-    if ( ref( $_[0] ) ) {
+    if ( $_[0]->isa('Video::Subtitle::Simple::ASS::Style') ) {
         push @{ $self->Styles }, $_[0];
     }
-    else {
+    elsif ( ref( $_[0] ) eq 'HASH' ) {
+        push @{ $self->Styles },
+          Video::Subtitle::Simple::ASS::Style->new( %{ $_[0] } );
+    }
+    elsif ( scalar @_ > 1 ) {
         push @{ $self->Styles }, Video::Subtitle::Simple::ASS::Style->new(@_);
+    }
+    else {
+        Carp::croak('invalid argument');
     }
     return $self;
 }
@@ -116,6 +123,8 @@ Removes the given L<Video::Subtitle::Simple::ASS::Style> from the file
 
 sub remove_style {
     my ( $self, $style ) = @_;
+    Carp::croak('was not a Video::Subtitle::Simple::ASS::Style object')
+      unless $style->isa('Video::Subtitle::Simple::ASS::Style');
     $self->Styles( [ grep { !$_->is_equal($style) } @{ $self->Styles } ] );
     return $self;
 }
@@ -146,11 +155,18 @@ Adds the given L<Video::Subtitle::Simple::ASS::Event> to the file
 
 sub add_event {
     my $self = shift;
-    if ( ref( $_[0] ) ) {
+    if ( $_[0]->isa('Video::Subtitle::Simple::ASS::Event') ) {
         push @{ $self->Events }, $_[0];
     }
+    elsif ( ref( $_[0] ) eq 'HASH' ) {
+        push @{ $self->Styles },
+          Video::Subtitle::Simple::ASS::Event->new( %{ $_[0] } );
+    }
+    elsif ( scalar @_ > 1 ) {
+        push @{ $self->Styles }, Video::Subtitle::Simple::ASS::Event->new(@_);
+    }
     else {
-        push @{ $self->Events }, Video::Subtitle::Simple::ASS::Event->new(@_);
+        Carp::croak('invalid argument');
     }
     return $self;
 }
@@ -162,7 +178,7 @@ Adds the given L<Video::Subtitle::Simple::Subtitle> consuming object to the file
 
 sub add_subtitle {
     my $self = shift;
-    if ( ref( $_[0] ) ) {
+    if ( $_[0]->DOES('Video::Subtitle::Simple::Subtitle') ) {
         push @{ $self->Events },
           Video::Subtitle::Simple::ASS::Event->new(
             start  => $_[0]->start,
@@ -171,9 +187,17 @@ sub add_subtitle {
             Format => 'Dialogue'
           );
     }
-    else {
+    elsif ( ref( $_[0] ) eq 'HASH' ) {
+        push @{ $self->Events },
+          Video::Subtitle::Simple::ASS::Event->new( %{ $_[0] },
+            Format => 'Dialogue' );
+    }
+    elsif ( scalar @_ > 1 ) {
         push @{ $self->Events },
           Video::Subtitle::Simple::ASS::Event->new( @_, Format => 'Dialogue' );
+    }
+    else {
+        Carp::croak('invalid argument');
     }
     return $self;
 }
@@ -182,11 +206,21 @@ with 'Video::Subtitle::Simple::File';
 
 =method add_dialogue
 
-Given a hash with the required fields for an L<Video::Subtitle::Simple::ASS::Event> object (start, end, text), the event will be added formatted as a dialogue
+Given a hash or hashref with the required fields for an L<Video::Subtitle::Simple::ASS::Event> object (start, end, text), the event will be added formatted as a dialogue
 =cut
 
 sub add_dialogue {
     my $self = shift;
+    my %subtitle;
+    if ( ref( $_[0] ) eq 'HASH' ) {
+        %subtitle = %{ $_[0] };
+    }
+    elsif ( scalar @_ > 1 ) {
+        %subtitle = @_;
+    }
+    else {
+        Carp::croak('invalid argument');
+    }
     $self->add_event(
         Video::Subtitle::Simple::ASS::Event->new( @_, Format => 'Dialogue' ) );
     return $self;
@@ -199,6 +233,16 @@ Given a hash with the required fields for an L<Video::Subtitle::Simple::ASS::Eve
 
 sub add_comment {
     my $self = shift;
+    my %subtitle;
+    if ( ref( $_[0] ) eq 'HASH' ) {
+        %subtitle = %{ $_[0] };
+    }
+    elsif ( scalar @_ > 1 ) {
+        %subtitle = @_;
+    }
+    else {
+        Carp::croak('invalid argument');
+    }
     $self->add_event(
         Video::Subtitle::Simple::ASS::Event->new( @_, Format => 'Comment' ) );
     return $self;
@@ -211,6 +255,8 @@ Removes any matching L<Video::Subtitle::Simple::ASS::Event> object from the file
 
 sub remove_event {
     my ( $self, $event ) = @_;
+    Carp::croak('was not a Video::Subtitle::Simple::ASS::Event object')
+      unless $event->isa('Video::Subtitle::Simple::ASS::Event');
     my @e = grep { !$_->is_equal($event) } @{ $self->Events };
     $self->Events( \@e );
     return $self;
@@ -223,6 +269,8 @@ Removes any matching L<Video::Subtitle::Simple::Subtitle> consuming object from 
 
 sub remove_subtitle {
     my ( $self, $subtitle ) = @_;
+    Carp::croak('was not a Video::Subtitle::Simple::Subtitle object')
+      unless $subtitle->isa('Video::Subtitle::Simple::Subtitle');
     my $params = {
         start  => $subtitle->start,
         end    => $subtitle->end,
@@ -253,12 +301,16 @@ Returns the ASS file as a string
 =cut
 
 sub to_string {
-    my $self      = shift;
-    my $ret       = "[Script Info]\n";
+    my $self = shift;
+    my $ret  = "[Script Info]\n";
+
+    #ensure these info keys get added first and in this order
     my @info_keys = ( 'Title', 'Original Script', 'ScriptType', 'Collisions' );
-    my %infos     = %{ $self->Info };
+    my %infos = %{ $self->Info };
     $ret .= "$_:$infos{$_}\n" foreach @info_keys;
     delete @infos{@info_keys};
+
+    #add the rest of the info keys
     while ( my ( $k, $v ) = each %infos ) {
         $ret .= "$k:$v\n";
     }
@@ -314,7 +366,7 @@ sub _create_from_array {
         my $line = shift;
         my %format;
         my ( $key, $value ) = map { trim } split /:/, $line, 2;
-        croak "Expecting Format got $key" unless $key eq 'Format';
+        Carp::croak("Expecting Format got $key") unless $key eq 'Format';
         my @tokens = map { trim } split /,/, $value;
         for my $index ( 0 .. $#tokens ) {
             $format{ $tokens[$index] } = $index;
@@ -357,7 +409,8 @@ sub _create_from_array {
         return @ret;
     };
 
-    croak 'invalid ass file' unless $subs[$line_number] =~ /\[Script Info\]/;
+    Carp::croak('invalid ass file')
+      unless $subs[$line_number] =~ /\[Script Info\]/;
 
     $blocks{'Info'} = {};
 
@@ -396,7 +449,7 @@ sub _create_from_array {
             push @{ $blocks{'Events'} },
               Video::Subtitle::Simple::ASS::Event->new(%$_)
               for @$hashes;
-          }
+        }
     };
 
     while ( $line_number < $#subs ) {
