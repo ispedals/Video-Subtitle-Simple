@@ -230,11 +230,13 @@ sub to_string {
 
 =method is_equal
 
-Returns whether another style is eqaul to the object
+Returns whether another style is equal to the object
 =cut
 
 sub is_equal {
     my ( $self, $other_block ) = @_;
+    Carp::croak('was not a Video::Subtitle::Simple::ASS::Style object')
+      unless $other_block->isa('Video::Subtitle::Simple::ASS::Style');
     return $self->to_string eq $other_block->to_string;
 }
 
