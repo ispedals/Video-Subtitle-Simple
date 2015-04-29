@@ -2,7 +2,7 @@ package Video::Subtitle::Simple::ASS::Style;
 
 # ABSTRACT: Representation of an ASS style
 # VERSION
-use v5.12;
+use v5.16;
 use strict;
 use warnings;
 

@@ -2,7 +2,7 @@ package Video::Subtitle::Simple::ASS::File;
 
 # ABSTRACT: Video::Subtitle::Simple::File based implementation of an ASS subtitle file
 # VERSION
-use v5.12;
+use v5.16;
 
 use Moo;
 use MooX::HandlesVia;

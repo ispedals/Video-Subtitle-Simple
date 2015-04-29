@@ -2,7 +2,7 @@ package Video::Subtitle::Simple::Subtitle;
 
 # ABSTRACT: Role representing a subtitle line
 # VERSION
-use v5.10;
+use v5.16;
 use strict;
 use warnings;
 

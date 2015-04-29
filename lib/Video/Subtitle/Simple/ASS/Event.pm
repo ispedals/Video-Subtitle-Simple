@@ -2,7 +2,7 @@ package Video::Subtitle::Simple::ASS::Event;
 
 # ABSTRACT: Representation of an ASS event
 # VERSION
-use v5.12;
+use v5.16;
 use strict;
 use warnings;
 

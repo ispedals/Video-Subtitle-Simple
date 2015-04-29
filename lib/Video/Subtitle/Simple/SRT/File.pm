@@ -2,7 +2,7 @@ package Video::Subtitle::Simple::SRT::File;
 
 # ABSTRACT: Representation of a Subrip file that implements Video::Subtitle::Simple::File
 # VERSION
-use v5.12;
+use v5.16;
 use strict;
 use warnings;
 
