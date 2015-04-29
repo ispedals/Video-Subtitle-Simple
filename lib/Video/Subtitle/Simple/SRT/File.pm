@@ -10,6 +10,7 @@ use Moo;
 use MooX::HandlesVia;
 use File::Slurp;
 use Carp;
+use Scalar::Util 'blessed';
 use Video::Subtitle::Simple::SRT::Subtitle;
 
 =head1 SYNOPSIS
@@ -87,17 +88,17 @@ sub add_subtitle {
     }
 
     my $subtitle = shift @_;
-    if ( $subtitle->DOES('Video::Subtitle::Simple::Subtitle') ) {
+    if ( ref($subtitle) eq 'HASH' ) {
+        push @{ $self->subtitles },
+          Video::Subtitle::Simple::SRT::Subtitle->new(%$subtitle);
+    }
+    elsif ( defined blessed($subtitle) and $subtitle->DOES('Video::Subtitle::Simple::Subtitle') ) {
         push @{ $self->subtitles },
           Video::Subtitle::Simple::SRT::Subtitle->new(
             start => $subtitle->start,
             end   => $subtitle->end,
             text  => $subtitle->get_text
           );
-    }
-    elsif ( ref($subtitle) eq 'HASH' ) {
-        push @{ $self->subtitles },
-          Video::Subtitle::Simple::SRT::Subtitle->new(%$subtitle);
     }
     else {
         Carp::croak('invalid argument');
