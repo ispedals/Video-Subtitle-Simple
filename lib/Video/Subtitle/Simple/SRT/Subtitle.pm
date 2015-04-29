@@ -60,13 +60,13 @@ around 'set_text' => sub {
 =attr start
 
 A L<Video::Subtitle::Simple::Time> object representing the start time of the line. This attribute must be specified during construction.
-Both a Subrip timestamp or a number representing the time in seconds may be used to set the value.
+Both a L<Video::Subtitle::Simple::Time> suitable string timestamp or a number representing the time in seconds may be used to set the value.
 =cut
 
 =attr end
 
 A L<Video::Subtitle::Simple::Time> object representing the end time of the line. This attribute must be specified during construction.
-Both a Subrip timestamp or a number representing the time in seconds may be used to set the value.
+Both a L<Video::Subtitle::Simple::Time> suitable string timestamp or a number representing the time in seconds may be used to set the value.
 =cut
 
 =method to_string
@@ -101,7 +101,7 @@ Returns a string hash code of the subtitle. Note that differences in whitespace 
 
 =method is_equal
 
-Returns true if two subtitles are equal. Two subtitles are equal if their hash codes are equal
+Returns true if two subtitles are equal. Two subtitles are equal if their hash codes are equal. Throws an exception on error.
 =cut
 
 1;
