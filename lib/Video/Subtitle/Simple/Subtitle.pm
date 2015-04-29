@@ -15,8 +15,8 @@ use Digest::MD5 qw(md5_hex);
 
 =head1 DESCRIPTION
 
-The interface was designed under the assumption that a subtitle line has a start and end time that can be represented in seconds elapsed, and a 
-textualcomponent that contains format-specfic markup. It is also assumed that a subtitle line is not dependant on other lines for its state
+B<Video::Subtitle::Simple::Subtitle> was designed under the assumption that a subtitle line has a start and end time that can be represented in seconds elapsed, and a 
+textual component that may contain format-specfic markup. It is also assumed that a subtitle line is not dependant on other lines for its state
 and the start time of a line cannot be greater than the end time.
 
 Module wanting to be subtitle lines appropriate for L<Video::Subtitle::Simple::File> implementors must implement:
@@ -81,7 +81,7 @@ has 'end' => (
 after [ 'start', 'end' ] => sub {
     my ( $self, $value ) = @_;
     return unless $value;
-    croak 'attempted to have start time greater than end time'
+    Carp::croak('attempted to have start time greater than end time')
       if $self->start->as_seconds > $self->end->as_seconds;
 };
 
@@ -114,12 +114,14 @@ sub hash_code {
 
 =method is_equal
 
-Returns true if two subtitles are equal. Two subtitles are equal if their hash codes are equal
+Returns true if two subtitles are equal. Two subtitles are equal if their hash codes are equal. Throws an exception on error.
 
 =cut
 
 sub is_equal {
     my ( $self, $other_line ) = @_;
+    Carp::croak('was not a Video::Subtitle::Simple::Subtitle object')
+      unless $other_line->DOES('Video::Subtitle::Simple::Subtitle');
     return $self->hash_code eq $other_line->hash_code;
 }
 
