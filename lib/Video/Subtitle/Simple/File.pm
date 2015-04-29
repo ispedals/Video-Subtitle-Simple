@@ -7,6 +7,7 @@ use strict;
 use warnings;
 
 use Moo::Role;
+use Carp;
 use Digest::MD5;
 
 =head1 DESCRIPTION
@@ -47,12 +48,14 @@ requires 'create_from_file', 'create_from_string',
 
 Returns a L<Video::Subtitle::Simple::File> consuming object from the given L<Video::Subtitle::Simple::File> object.
 This is useful if one wants to convert an object into another subtitle format. However, there is no expectation that any formatting markup will
-be preserved during the conversion.
+be preserved during the conversion. Throws an exception on error.
 
 =cut
 
 sub create_from_subtitle {
     my ( $self, $file ) = @_;
+    Carp::croak('was not a Video::Subtitle::Simple::File object')
+      unless $file->DOES('Video::Subtitle::Simple::File');
     my $s = $self->new();
     $s->add_subtitle($_) foreach $file->get_subtitles();
     return $s;
@@ -76,11 +79,13 @@ sub hash_code {
 
 =method is_equal
 
-Returns whether the given L<Video::Subtitle::Role::Subtitle> consuming object is equal to the object. The same caveats apply as in C<hash_code>
+Returns whether the given L<Video::Subtitle::Simple::File> consuming object is equal to the object. The same caveats apply as in C<hash_code>. Throws an exception on error.
 =cut
 
 sub is_equal {
     my ( $self, $other_file ) = @_;
+    Carp::croak('was not a Video::Subtitle::Simple::File object')
+      unless $other_file->DOES('Video::Subtitle::Simple::File');
     return $self->hash_code eq $other_file->hash_code;
 }
 
