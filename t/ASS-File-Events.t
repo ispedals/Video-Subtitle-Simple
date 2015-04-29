@@ -1,10 +1,10 @@
 #!perl
-use v5.12;
+use v5.16;
+use utf8;
 use strict;
 use warnings;
-use utf8;
 
-use Test::More tests => 12;
+use Test::More tests => 15;
 
 use Video::Subtitle::Simple::ASS::File;
 
@@ -112,3 +112,15 @@ $file = Video::Subtitle::Simple::ASS::File->create_from_string($out);
 cmp_ok( $g[0]->start->as_seconds, '==', 11.830,
 'get_subtitles() sorted by considering the entire timestamp, not just the "second" component'
 );
+
+$file = Video::Subtitle::Simple::ASS::File->new;
+
+$file->add_event(
+    { Format => 'Dialogue', start => 2, end => 3, Text => 'C,A' } );
+is( scalar @{ $file->Events }, 1, 'add_event() handles hashrefs' );
+
+$file->add_dialogue( { start => 1, end => 2, Text => 'B' } );
+is( scalar @{ $file->Events }, 2, 'add_dialogue() handles hashrefs' );
+
+$file->add_comment( { start => 0, end => 1, Text => 'A' } );
+is( scalar @{ $file->Events }, 3, 'add_comment() handles hashrefs' );

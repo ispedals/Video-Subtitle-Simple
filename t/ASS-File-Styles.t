@@ -1,9 +1,9 @@
 #!perl
-use v5.12;
+
 use strict;
 use warnings;
 
-use Test::More tests => 5;
+use Test::More tests => 7;
 
 use Video::Subtitle::Simple::ASS::File;
 
@@ -21,3 +21,10 @@ is( @{ $file->Styles }[1]->Name, 'Boom', 'Styles are recieved as reference' );
 $file->remove_style($_)
   foreach $file->get_style_by_attribute( sub { $_->Name eq 'Boom' } );
 is( scalar @{ $file->Styles }, 1, 'remove_style() removed Style' );
+
+$file = Video::Subtitle::Simple::ASS::File->new;
+
+$file->add_style( { Name => 'Note' } );
+is( scalar @{ $file->Styles }, 2, 'add_style() handles hashrefs' );
+$file->add_style( @{ $file->Styles }[0] );
+is( scalar @{ $file->Styles }, 3, 'add_style() handles objects' );

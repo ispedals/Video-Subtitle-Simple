@@ -1,9 +1,9 @@
 #!perl
-use v5.12;
+
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 use Video::Subtitle::Simple::ASS::Event;
 my $event = Video::Subtitle::Simple::ASS::Event->new(
@@ -17,3 +17,4 @@ is(
     'Dialogue: 0,00:00:02.000,00:00:03.000,Default,,0000,0000,0000,,',
     'to_string() works'
 );
+ok( $event->is_equal($event), 'is_equal() works' );

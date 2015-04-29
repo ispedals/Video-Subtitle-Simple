@@ -1,6 +1,5 @@
 #!perl
 
-use v5.16;
 use strict;
 use warnings;
 use Test::More tests => 13;
@@ -24,8 +23,8 @@ is(
     'and had the correct Text attribute'
 );
 
-$file->add_subtitle( start => 1, end => 2, text => 'This occurs at 1 second');
-is(scalar @{$file->subtitles}, 2, 'add_subtitles accepted a plain hash');
+$file->add_subtitle( start => 1, end => 2, text => 'This occurs at 1 second' );
+is( scalar @{ $file->subtitles }, 2, 'add_subtitles accepted a plain hash' );
 my @subs = $file->get_subtitles();
 is(
     join( ', ', map { $_->get_text } @subs ),
