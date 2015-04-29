@@ -30,7 +30,7 @@ differences that result from handling noninteger seconds.
 * C<from_string> accepts the ISO 8601 time string type of "hh:mm:ss", but it also accepts
 "hh:mm:ss.sss"
 * C<as_string> returns a ISO 8601 time string type of "hh:mm:ss.sss"
-* The C<second> accessor no longer returns a float instead of an integer
+* The C<second> accessor returns a float instead of an integer
 * Accessor methods C<integer_second> and C<millisecond> have been added to easily manipulate
 the second component of the time
 
