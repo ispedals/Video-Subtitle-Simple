@@ -7,6 +7,7 @@ use strict;
 use warnings;
 
 use Moo;
+use Carp;
 
 =head1 SYNOPSIS
 
@@ -167,11 +168,13 @@ sub to_string {
 
 =method is_equal
 
-Returns whether another event is equal to the object
+Returns whether another event is equal to the object. Throws exception on error.
 =cut
 
 sub is_equal {
     my ( $self, $other_block ) = @_;
+    Carp::croak('was not a Video::Subtitle::Simple::ASS::Event object')
+      unless $other_block->isa('Video::Subtitle::Simple::ASS::Event');
     return $self->to_string eq $other_block->to_string;
 }
 
