@@ -18,7 +18,6 @@ SKIP: {
     my $srt =
       Video::Subtitle::Simple::SRT::Subtitle->new(
         { start => 0, end => 1, text => 'srt' } );
-    say $srt->get_text;
     $file->add_subtitle($srt);
     my @s = $file->get_subtitles;
     is( scalar @s, 1, 'add_subtitle() works' );
