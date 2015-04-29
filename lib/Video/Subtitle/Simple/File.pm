@@ -11,8 +11,8 @@ use Digest::MD5;
 
 =head1 DESCRIPTION
 
-B<Video::Subtitle::Simple::File> was created to provide a consistant interface for manipulating subtitle files regardless of format. 
-The interface was designed under the assumption that a subtitle file can be represented as a container which contains multiple subtitle lines. 
+B<Video::Subtitle::Simple::File> was created to provide a consistant interface for manipulating subtitle files regardless of format.
+The role was designed under the assumption that a subtitle file can be represented as a container which contains multiple subtitle lines.
 
 Modules wanting to be subtitle files must implement the required methods:
 
@@ -32,15 +32,11 @@ assumed that the string has been properly decoded.
 =head2 Methods
 
 =for :list
-* C<to_string>: the string representation of the file that could be used in playback
-
-Because of the different representations of storing subtitles, the following accessors are required:
-
-=for :list
+* C<to_string>: the string representation of the file that could be used during playback
 * C<get_subtitles>: returns an array of L<Video::Subtitle::Simple::Subtitle> implementing objects in chronological order
 * C<add_subtitle>, C<remove_subtitle>: add or remove subtitle objects implementing L<Video::Subtitle::Simple::Subtitle> such that they will be included in the C<to_string> representation
 
-Sucessful implementions recieve the constructor C<create_from_subtitle> and the C<is_equal> and C<hash_code> methods.
+Sucessful implementions receive the constructor C<create_from_subtitle> and the C<is_equal> and C<hash_code> methods.
 
 =cut
 
