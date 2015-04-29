@@ -150,7 +150,7 @@ Given a subroutine, it returns a list of all L<Video::Subtitle::Simple::ASS::Eve
 
 =method add_event
 
-Adds the given L<Video::Subtitle::Simple::ASS::Event> to the file
+Adds the given L<Video::Subtitle::Simple::ASS::Event>, hash or hashref to the file
 =cut
 
 sub add_event {
@@ -159,11 +159,11 @@ sub add_event {
         push @{ $self->Events }, $_[0];
     }
     elsif ( ref( $_[0] ) eq 'HASH' ) {
-        push @{ $self->Styles },
+        push @{ $self->Events },
           Video::Subtitle::Simple::ASS::Event->new( %{ $_[0] } );
     }
     elsif ( scalar @_ > 1 ) {
-        push @{ $self->Styles }, Video::Subtitle::Simple::ASS::Event->new(@_);
+        push @{ $self->Events }, Video::Subtitle::Simple::ASS::Event->new(@_);
     }
     else {
         Carp::croak('invalid argument');
@@ -173,7 +173,7 @@ sub add_event {
 
 =method add_subtitle
 
-Adds the given L<Video::Subtitle::Simple::Subtitle> consuming object to the file
+Adds the given L<Video::Subtitle::Simple::Subtitle> consuming object, hash or hashref to the file
 =cut
 
 sub add_subtitle {
@@ -228,7 +228,7 @@ sub add_dialogue {
 
 =method add_comment
 
-Given a hash with the required fields for an L<Video::Subtitle::Simple::ASS::Event> object (start, end, Text), the event will be added formatted as a comment
+Given a hash or hashref with the required fields for an L<Video::Subtitle::Simple::ASS::Event> object (start, end, Text), the event will be added formatted as a comment
 =cut
 
 sub add_comment {
@@ -270,7 +270,7 @@ Removes any matching L<Video::Subtitle::Simple::Subtitle> consuming object from 
 sub remove_subtitle {
     my ( $self, $subtitle ) = @_;
     Carp::croak('was not a Video::Subtitle::Simple::Subtitle object')
-      unless $subtitle->isa('Video::Subtitle::Simple::Subtitle');
+      unless $subtitle->DOES('Video::Subtitle::Simple::Subtitle');
     my $params = {
         start  => $subtitle->start,
         end    => $subtitle->end,
