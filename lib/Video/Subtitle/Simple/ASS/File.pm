@@ -9,6 +9,7 @@ use MooX::HandlesVia;
 use Carp;
 use File::Slurp;
 use Text::Trim;
+use Scalar::Util 'blessed';
 
 use Video::Subtitle::Simple::ASS::Style;
 use Video::Subtitle::Simple::ASS::Event;
@@ -100,7 +101,9 @@ Adds the given L<Video::Subtitle::Simple::ASS::Style> object, hash, or hashref o
 
 sub add_style {
     my $self = shift;
-    if ( $_[0]->isa('Video::Subtitle::Simple::ASS::Style') ) {
+    if ( defined blessed( $_[0] )
+        and $_[0]->isa('Video::Subtitle::Simple::ASS::Style') )
+    {
         push @{ $self->Styles }, $_[0];
     }
     elsif ( ref( $_[0] ) eq 'HASH' ) {
@@ -155,15 +158,17 @@ Adds the given L<Video::Subtitle::Simple::ASS::Event>, hash or hashref to the fi
 
 sub add_event {
     my $self = shift;
-    if ( $_[0]->isa('Video::Subtitle::Simple::ASS::Event') ) {
-        push @{ $self->Events }, $_[0];
+    if ( scalar @_ > 1 ) {
+        push @{ $self->Events }, Video::Subtitle::Simple::ASS::Event->new(@_);
     }
     elsif ( ref( $_[0] ) eq 'HASH' ) {
         push @{ $self->Events },
           Video::Subtitle::Simple::ASS::Event->new( %{ $_[0] } );
     }
-    elsif ( scalar @_ > 1 ) {
-        push @{ $self->Events }, Video::Subtitle::Simple::ASS::Event->new(@_);
+    elsif ( defined blessed( $_[0] )
+        and $_[0]->isa('Video::Subtitle::Simple::ASS::Event') )
+    {
+        push @{ $self->Events }, $_[0];
     }
     else {
         Carp::croak('invalid argument');
@@ -178,7 +183,9 @@ Adds the given L<Video::Subtitle::Simple::Subtitle> consuming object, hash or ha
 
 sub add_subtitle {
     my $self = shift;
-    if ( $_[0]->DOES('Video::Subtitle::Simple::Subtitle') ) {
+    if ( defined blessed( $_[0] )
+        and $_[0]->DOES('Video::Subtitle::Simple::Subtitle') )
+    {
         push @{ $self->Events },
           Video::Subtitle::Simple::ASS::Event->new(
             start  => $_[0]->start,
@@ -221,8 +228,8 @@ sub add_dialogue {
     else {
         Carp::croak('invalid argument');
     }
-    $self->add_event(
-        Video::Subtitle::Simple::ASS::Event->new( @_, Format => 'Dialogue' ) );
+    $subtitle{Format} = 'Dialogue';
+    $self->add_event( Video::Subtitle::Simple::ASS::Event->new(%subtitle) );
     return $self;
 }
 
@@ -243,8 +250,8 @@ sub add_comment {
     else {
         Carp::croak('invalid argument');
     }
-    $self->add_event(
-        Video::Subtitle::Simple::ASS::Event->new( @_, Format => 'Comment' ) );
+    $subtitle{Format} = 'Comment';
+    $self->add_event( Video::Subtitle::Simple::ASS::Event->new(%subtitle) );
     return $self;
 }
 
